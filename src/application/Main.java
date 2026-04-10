@@ -3,8 +3,11 @@ package application;
 import entities.Funcionario;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -32,17 +35,18 @@ public class Main {
         //ITEM 3.2
         empList.removeIf(f -> "João".equals(f.getName()));
 
+        System.out.println("----------------------");
         System.out.println("==============ITEM 3.3==============");
         System.out.println("----------------------");
 
-        for (Funcionario func : empList){
-            System.out.println("Nome: " + func.getName());
-            System.out.println("Data Nascimento: " + func.getNascimento().format(dataFormatter));
-            System.out.println("Salário: " + numeroFormatter.format(func.getSalary()));
-            System.out.println("Função: " + func.getFunction());
-            System.out.println("----------------------");
-        }
+        empList.forEach(func -> {
+            System.out.println(func.getName() +
+                    " | " + func.getNascimento().format(dataFormatter) +
+                    " | " + numeroFormatter.format(func.getSalary()) +
+                    " | " + func.getFunction());
+        });
 
+        System.out.println("----------------------");
         System.out.println("==============ITEM 3.4==============");
         System.out.println("----------------------");
 
@@ -51,14 +55,14 @@ public class Main {
             f.reajustarSalario(new BigDecimal("0.10"));
         }
 
-        for (Funcionario func : empList){
-            System.out.println("Nome: " + func.getName());
-            System.out.println("Data Nascimento: " + func.getNascimento().format(dataFormatter));
-            System.out.println("Salário (Reajustado): " + numeroFormatter.format(func.getSalary()));
-            System.out.println("Função: " + func.getFunction());
-            System.out.println("----------------------");
-        }
+        empList.forEach(func -> {
+            System.out.println(func.getName() +
+                            " | " + func.getNascimento().format(dataFormatter) +
+                            " | " + numeroFormatter.format(func.getSalary()) +
+                            " | " + func.getFunction());
+        });
 
+        System.out.println("----------------------");
         System.out.println("==============ITEM 3.5 e 3.6==============");
         System.out.println("----------------------");
 
@@ -72,9 +76,64 @@ public class Main {
             System.out.println("Função: " + funcao);
 
             lista.forEach(f -> {
-                System.out.println(f.getName() + " | " + f.getNascimento() + " | " + f.getSalary());
+                System.out.println(f.getName() + " | " + f.getNascimento().format(dataFormatter) + " | " + numeroFormatter.format(f.getSalary()));
             });
             System.out.println("----------------------");
         });
+
+        System.out.println("==============ITEM 3.8==============");
+        System.out.println("----------------------");
+
+        empList.stream()
+                .filter(func -> {
+                    Month mes = func.getNascimento().getMonth();
+                    return mes == Month.OCTOBER || mes == Month.DECEMBER;
+                })
+                .forEach(f -> System.out.println("Nome: " + f.getName() + " | Nascimento: " + f.getNascimento().format(dataFormatter)));
+
+        System.out.println("----------------------");
+        System.out.println("==============ITEM 3.9==============");
+        System.out.println("----------------------");
+
+        Funcionario older = empList.stream()
+                .min(Comparator.comparing(Funcionario::getNascimento))
+                .orElse(null);
+
+        if (older != null){
+            int idade = Period.between(older.getNascimento(), LocalDate.now()).getYears();
+            System.out.println(older.getName() + " é o mais velho, ele tem " + idade + " anos.");
+        }
+
+        System.out.println("----------------------");
+        System.out.println("==============ITEM 3.10==============");
+        System.out.println("----------------------");
+
+        empList.sort(Comparator.comparing(Funcionario::getName));
+        empList.forEach(func -> System.out.println(func.getName() +
+                " | " + func.getNascimento().format(dataFormatter) +
+                " | " + "R$ " + numeroFormatter.format(func.getSalary()) +
+                " | " + func.getFunction()));
+
+        System.out.println("----------------------");
+        System.out.println("==============ITEM 3.11==============");
+        System.out.println("----------------------");
+
+        BigDecimal total = empList.stream()
+                .map(Funcionario::getSalary)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        System.out.println("Total dos salários: R$ " + numeroFormatter.format(total));
+
+        System.out.println("----------------------");
+        System.out.println("==============ITEM 3.12==============");
+        System.out.println("----------------------");
+
+        BigDecimal salarioMin = new BigDecimal("1212.00");
+
+        empList.forEach(func -> {
+            BigDecimal qtdSalario = func.getSalary().divide(salarioMin, 2, RoundingMode.HALF_UP);
+            System.out.println(func.getName() + " recebe " + qtdSalario + " salários mínimos");
+        });
+
     }
 }
