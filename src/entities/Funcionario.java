@@ -1,7 +1,9 @@
+package entities;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class Funcionario extends Pessoa{
+public class Funcionario extends Pessoa {
     private BigDecimal salary;
     private String function;
 
@@ -25,5 +27,9 @@ public class Funcionario extends Pessoa{
 
     public void setFunction(String function) {
         this.function = function;
+    }
+
+    public void reajustarSalario(BigDecimal percentual) {
+        this.salary = this.salary.add(this.salary.multiply(percentual));
     }
 }
